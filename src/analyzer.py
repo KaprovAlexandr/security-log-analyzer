@@ -9,7 +9,7 @@ def read_log(path: Path):
     """
     Читает лог-файл и возвращает список строк.
     """
-		
+    
     with open(path, "r", encoding="utf-8") as file:
         lines = file.readlines()
 
@@ -42,11 +42,11 @@ def find_failed_password(lines):
 
     for ip, count in ip_counter.most_common(10):
 
-    	if count >= 5:
-        	print(f"{ip} -> {count} попыток  BRUTE FORCE")
+      if count >= 5:
+          print(f"{ip} -> {count} попыток  BRUTE FORCE")
 
-    	else:
-        	print(f"{ip} -> {count} попыток")
+      else:
+          print(f"{ip} -> {count} попыток")
 
     print("\n---------------------------")
     print(f"Всего Failed password: {failed_count}")
@@ -125,6 +125,38 @@ def correlate_bruteforce_success(lines):
 
 
 
+def find_sudo_activity(lines):
+    """
+    Ищет использование sudo.
+    """
+
+    pattern = re.compile(
+        r"sudo:\s+(\w+)\s+:.*COMMAND=(.+)"
+    )
+
+    sudo_counter = 0
+
+    print("\n===== SUDO ACTIVITY =====\n")
+
+    for line in lines:
+
+        match = pattern.search(line)
+
+        if match:
+
+            user = match.group(1)
+            command = match.group(2)
+
+            print(f"Пользователь: {user}")
+            print(f"Команда: {command}")
+            print()
+
+            sudo_counter += 1
+
+    print("---------------------------")
+    print(f"Всего sudo-команд: {sudo_counter}")
+
+
 def main():
     lines = read_log(LOG_PATH)
 
@@ -133,6 +165,7 @@ def main():
     find_failed_password(lines)
     find_success_login(lines)
     correlate_bruteforce_success(lines)
+    find_sudo_activity(lines)
 
 if __name__ == "__main__":
     main()
