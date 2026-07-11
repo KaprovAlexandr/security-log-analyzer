@@ -157,6 +157,37 @@ def find_sudo_activity(lines):
     print(f"Всего sudo-команд: {sudo_counter}")
 
 
+
+def find_new_users(lines):
+    """
+    Ищет создание новых пользователей.
+    """
+
+    pattern = re.compile(
+        r"useradd.*name=(\w+)"
+    )
+
+    user_counter = 0
+
+    print("\n===== NEW USERS =====\n")
+
+    for line in lines:
+
+        match = pattern.search(line)
+
+        if match:
+
+            username = match.group(1)
+
+            print(f"Создан пользователь: {username}")
+
+            user_counter += 1
+
+    print("\n---------------------------")
+    print(f"Всего новых пользователей: {user_counter}")
+
+
+
 def main():
     lines = read_log(LOG_PATH)
 
@@ -166,6 +197,7 @@ def main():
     find_success_login(lines)
     correlate_bruteforce_success(lines)
     find_sudo_activity(lines)
+    find_new_users(lines)
 
 if __name__ == "__main__":
     main()
