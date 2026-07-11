@@ -1,6 +1,22 @@
 Jul 10 09:15:21 ubuntu sshd[1123]: Failed password for invalid user admin from 192.168.1.15 port 54822 ssh2
 Jul 10 09:15:24 ubuntu sshd[1123]: Failed password for invalid user admin from 192.168.1.15 port 54822 ssh2
 Jul 10 09:15:29 ubuntu sshd[1123]: Failed password for invalid user admin from 192.168.1.15 port 54822 ssh2
+Jul 10 09:15:33 ubuntu sshd[1123]: Failed password for invalid user admin from 192.168.1.15 port 54822 ssh2
+Jul 10 09:15:37 ubuntu sshd[1123]: Failed password for invalid user admin from 192.168.1.15 port 54822 ssh2
+Jul 10 09:15:40 ubuntu sshd[1123]: Failed password for invalid user admin from 192.168.1.15 port 54822 ssh2
+
+Jul 10 09:16:12 ubuntu sshd[1141]: Failed password for root from 192.168.1.25 port 52011 ssh2
+Jul 10 09:16:16 ubuntu sshd[1141]: Failed password for root from 192.168.1.25 port 52011 ssh2
+
 Jul 10 09:17:04 ubuntu sshd[1188]: Accepted password for alex from 192.168.1.10 port 52981 ssh2
+
 Jul 10 09:18:11 ubuntu sudo: alex : TTY=pts/0 ; PWD=/home/alex ; USER=root ; COMMAND=/usr/bin/apt update
+
 Jul 10 09:19:42 ubuntu useradd[1402]: new user: name=testuser uid=1002 gid=1002 home=/home/testuser shell=/bin/bash
+
+Jul 10 09:20:12 ubuntu sshd[1500]: Failed password for root from 10.0.0.55 port 51022 ssh2
+Jul 10 09:20:16 ubuntu sshd[1500]: Failed password for root from 10.0.0.55 port 51022 ssh2
+Jul 10 09:20:20 ubuntu sshd[1500]: Failed password for root from 10.0.0.55 port 51022 ssh2
+Jul 10 09:20:25 ubuntu sshd[1500]: Failed password for root from 10.0.0.55 port 51022 ssh2
+Jul 10 09:20:29 ubuntu sshd[1500]: Failed password for root from 10.0.0.55 port 51022 ssh2
+Jul 10 09:20:34 ubuntu sshd[1500]: Failed password for root from 10.0.0.55 port 51022 ssh2
