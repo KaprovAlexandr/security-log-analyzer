@@ -188,6 +188,36 @@ def find_new_users(lines):
 
 
 
+def find_ssh_sessions(lines):
+    """
+    Ищет открытия SSH-сессий.
+    """
+
+    pattern = re.compile(
+        r"session opened for user (\w+)"
+    )
+
+    session_counter = 0
+
+    print("\n===== SSH SESSIONS =====\n")
+
+    for line in lines:
+
+        match = pattern.search(line)
+
+        if match:
+
+            user = match.group(1)
+
+            print(f"Открыта SSH-сессия: {user}")
+
+            session_counter += 1
+
+    print("\n---------------------------")
+    print(f"Всего SSH-сессий: {session_counter}")
+
+
+
 def main():
     lines = read_log(LOG_PATH)
 
@@ -198,6 +228,7 @@ def main():
     correlate_bruteforce_success(lines)
     find_sudo_activity(lines)
     find_new_users(lines)
+    find_ssh_sessions(lines)
 
 if __name__ == "__main__":
     main()

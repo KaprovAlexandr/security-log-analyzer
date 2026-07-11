@@ -10,6 +10,10 @@ Jul 10 09:16:16 ubuntu sshd[1141]: Failed password for root from 192.168.1.25 po
 
 Jul 10 09:17:04 ubuntu sshd[1188]: Accepted password for admin from 192.168.1.15 port 52981 ssh2
 
+Jul 10 09:17:05 ubuntu sshd[1188]: pam_unix(sshd:session): session opened for user admin by (uid=0)
+
+Jul 10 09:18:25 ubuntu sshd[1200]: pam_unix(sshd:session): session opened for user alex by (uid=0)
+
 Jul 10 09:18:11 ubuntu sudo: alex : TTY=pts/0 ; PWD=/home/alex ; USER=root ; COMMAND=/usr/bin/apt update
 
 Jul 10 09:19:42 ubuntu useradd[1402]: new user: name=testuser uid=1002 gid=1002 home=/home/testuser shell=/bin/bash
