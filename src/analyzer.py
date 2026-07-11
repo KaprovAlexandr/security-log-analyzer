@@ -1,4 +1,5 @@
 import re
+import json
 from pathlib import Path
 from collections import Counter
 
@@ -289,6 +290,24 @@ def find_root_logins(lines):
     print(f"Всего входов под root: {root_counter}")
 
 
+
+def export_results():
+    """
+    Сохраняет результаты анализа в JSON.
+    """
+
+    results = {
+        "log_file": str(LOG_PATH),
+        "status": "analysis completed"
+    }
+
+    with open("results.json", "w", encoding="utf-8") as file:
+        json.dump(results, file, indent=4, ensure_ascii=False)
+
+    print("\nРезультаты сохранены в results.json")
+
+
+
 def main():
     lines = read_log(LOG_PATH)
 
@@ -302,6 +321,11 @@ def main():
     find_ssh_sessions(lines)
     find_failed_sudo(lines)
     find_root_logins(lines)
+    
+    export_results()
+
+
+
 
 if __name__ == "__main__":
     main()
