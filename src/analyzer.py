@@ -83,6 +83,48 @@ def find_success_login(lines):
 
 
 
+def correlate_bruteforce_success(lines):
+    """
+    Ищет успешный вход после серии Failed password.
+    """
+
+    failed_pattern = re.compile(
+        r"Failed password.*from (\d+\.\d+\.\d+\.\d+)"
+    )
+
+    success_pattern = re.compile(
+        r"Accepted password for (\w+) from (\d+\.\d+\.\d+\.\d+)"
+    )
+
+    failed_counter = Counter()
+
+    print("\n===== Brute Force Correlation =====\n")
+
+    for line in lines:
+
+        failed_match = failed_pattern.search(line)
+
+        if failed_match:
+            ip = failed_match.group(1)
+            failed_counter[ip] += 1
+
+        success_match = success_pattern.search(line)
+
+        if success_match:
+
+            user = success_match.group(1)
+            ip = success_match.group(2)
+
+            if failed_counter[ip] >= 5:
+
+                print("ВОЗМОЖНЫЙ BRUTE FORCE")
+                print(f"IP: {ip}")
+                print(f"User: {user}")
+                print(f"Failed attempts: {failed_counter[ip]}")
+                print()
+
+
+
 def main():
     lines = read_log(LOG_PATH)
 
@@ -90,6 +132,7 @@ def main():
 
     find_failed_password(lines)
     find_success_login(lines)
+    correlate_bruteforce_success(lines)
 
 if __name__ == "__main__":
     main()
