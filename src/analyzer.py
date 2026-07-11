@@ -218,6 +218,46 @@ def find_ssh_sessions(lines):
 
 
 
+def find_failed_sudo(lines):
+    """
+    Ищет неудачные попытки использования sudo.
+    """
+
+    failure_pattern = re.compile(
+        r"sudo:.*authentication failure"
+    )
+
+    incorrect_pattern = re.compile(
+        r"sudo:.*incorrect password attempts"
+    )
+
+    failed_counter = 0
+
+    print("\n===== FAILED SUDO =====\n")
+
+    for line in lines:
+
+        if failure_pattern.search(line):
+
+            print("Authentication failure")
+            print(line.strip())
+            print()
+
+            failed_counter += 1
+
+        elif incorrect_pattern.search(line):
+
+            print("Incorrect password attempts")
+            print(line.strip())
+            print()
+
+            failed_counter += 1
+
+    print("---------------------------")
+    print(f"Всего неудачных sudo: {failed_counter}")
+
+
+
 def main():
     lines = read_log(LOG_PATH)
 
@@ -229,6 +269,7 @@ def main():
     find_sudo_activity(lines)
     find_new_users(lines)
     find_ssh_sessions(lines)
+    find_failed_sudo(lines)
 
 if __name__ == "__main__":
     main()
