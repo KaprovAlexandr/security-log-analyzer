@@ -258,6 +258,37 @@ def find_failed_sudo(lines):
 
 
 
+def find_root_logins(lines):
+    """
+    Ищет успешные входы под root.
+    """
+
+    pattern = re.compile(
+        r"Accepted password for root from (\d+\.\d+\.\d+\.\d+)"
+    )
+
+    root_counter = 0
+
+    print("\n===== ROOT LOGIN =====\n")
+
+    for line in lines:
+
+        match = pattern.search(line)
+
+        if match:
+
+            ip = match.group(1)
+
+            print("ВНИМАНИЕ! Вход под root")
+            print(f"IP: {ip}")
+            print()
+
+            root_counter += 1
+
+    print("---------------------------")
+    print(f"Всего входов под root: {root_counter}")
+
+
 def main():
     lines = read_log(LOG_PATH)
 
@@ -270,6 +301,7 @@ def main():
     find_new_users(lines)
     find_ssh_sessions(lines)
     find_failed_sudo(lines)
+    find_root_logins(lines)
 
 if __name__ == "__main__":
     main()
