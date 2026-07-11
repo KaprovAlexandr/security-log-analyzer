@@ -40,7 +40,7 @@ def find_failed_password(lines):
 
     print("\n===== Failed password =====\n")
 
-    for ip, count in ip_counter.items():
+    for ip, count in ip_counter.most_common(10):
 
     	if count >= 5:
         	print(f"{ip} -> {count} попыток  BRUTE FORCE")
