@@ -52,13 +52,44 @@ def find_failed_password(lines):
     print(f"Всего Failed password: {failed_count}")
 
 
+
+def find_success_login(lines):
+    """
+    Ищет успешные входы.
+    """
+
+    pattern = re.compile(
+        r"Accepted password for (\w+) from (\d+\.\d+\.\d+\.\d+)"
+    )
+
+    success_counter = 0
+
+    print("\n===== Successful Login =====\n")
+
+    for line in lines:
+
+        match = pattern.search(line)
+
+        if match:
+            user = match.group(1)
+            ip = match.group(2)
+
+            print(f"{ip} -> пользователь {user}")
+
+            success_counter += 1
+
+    print("\n---------------------------")
+    print(f"Всего успешных входов: {success_counter}")
+
+
+
 def main():
     lines = read_log(LOG_PATH)
 
     print(f"Всего строк: {len(lines)}")
 
     find_failed_password(lines)
-
+    find_success_login(lines)
 
 if __name__ == "__main__":
     main()
