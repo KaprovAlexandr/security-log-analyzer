@@ -10,12 +10,11 @@ def read_log(path: Path):
     """
     Читает лог-файл и возвращает список строк.
     """
-    
+
     with open(path, "r", encoding="utf-8") as file:
         lines = file.readlines()
 
     return lines
-
 
 
 def find_failed_password(lines):
@@ -43,15 +42,18 @@ def find_failed_password(lines):
 
     for ip, count in ip_counter.most_common(10):
 
-      if count >= 5:
-          print(f"{ip} -> {count} попыток  BRUTE FORCE")
-
-      else:
-          print(f"{ip} -> {count} попыток")
+        if count >= 5:
+            print(f"{ip} -> {count} попыток  BRUTE FORCE")
+        else:
+            print(f"{ip} -> {count} попыток")
 
     print("\n---------------------------")
     print(f"Всего Failed password: {failed_count}")
 
+    return {
+        "total": failed_count,
+        "top_ips": dict(ip_counter)
+    }
 
 
 def find_success_login(lines):
@@ -64,6 +66,7 @@ def find_success_login(lines):
     )
 
     success_counter = 0
+    success_logins = []
 
     print("\n===== Successful Login =====\n")
 
@@ -77,11 +80,20 @@ def find_success_login(lines):
 
             print(f"{ip} -> пользователь {user}")
 
+            success_logins.append({
+                "user": user,
+                "ip": ip
+            })
+
             success_counter += 1
 
     print("\n---------------------------")
     print(f"Всего успешных входов: {success_counter}")
 
+    return {
+        "total": success_counter,
+        "logins": success_logins
+    }
 
 
 def correlate_bruteforce_success(lines):
@@ -100,6 +112,8 @@ def correlate_bruteforce_success(lines):
     failed_counter = Counter()
 
     print("\n===== Brute Force Correlation =====\n")
+
+    brute_force_events = []
 
     for line in lines:
 
@@ -124,6 +138,13 @@ def correlate_bruteforce_success(lines):
                 print(f"Failed attempts: {failed_counter[ip]}")
                 print()
 
+                brute_force_events.append({
+                    "ip": ip,
+                    "user": user,
+                    "failed_attempts": failed_counter[ip]
+                })
+
+    return brute_force_events
 
 
 def find_sudo_activity(lines):
@@ -136,6 +157,7 @@ def find_sudo_activity(lines):
     )
 
     sudo_counter = 0
+    commands = []
 
     print("\n===== SUDO ACTIVITY =====\n")
 
@@ -152,11 +174,20 @@ def find_sudo_activity(lines):
             print(f"Команда: {command}")
             print()
 
+            commands.append({
+                "user": user,
+                "command": command
+            })
+
             sudo_counter += 1
 
     print("---------------------------")
     print(f"Всего sudo-команд: {sudo_counter}")
 
+    return {
+        "total": sudo_counter,
+        "commands": commands
+    }
 
 
 def find_new_users(lines):
@@ -169,6 +200,7 @@ def find_new_users(lines):
     )
 
     user_counter = 0
+    users = []
 
     print("\n===== NEW USERS =====\n")
 
@@ -182,11 +214,17 @@ def find_new_users(lines):
 
             print(f"Создан пользователь: {username}")
 
+            users.append(username)
+
             user_counter += 1
 
     print("\n---------------------------")
     print(f"Всего новых пользователей: {user_counter}")
 
+    return {
+        "total": user_counter,
+        "users": users
+    }
 
 
 def find_ssh_sessions(lines):
@@ -199,6 +237,7 @@ def find_ssh_sessions(lines):
     )
 
     session_counter = 0
+    sessions = []
 
     print("\n===== SSH SESSIONS =====\n")
 
@@ -212,11 +251,17 @@ def find_ssh_sessions(lines):
 
             print(f"Открыта SSH-сессия: {user}")
 
+            sessions.append(user)
+
             session_counter += 1
 
     print("\n---------------------------")
     print(f"Всего SSH-сессий: {session_counter}")
 
+    return {
+        "total": session_counter,
+        "users": sessions
+    }
 
 
 def find_failed_sudo(lines):
@@ -233,6 +278,7 @@ def find_failed_sudo(lines):
     )
 
     failed_counter = 0
+    events = []
 
     print("\n===== FAILED SUDO =====\n")
 
@@ -244,6 +290,8 @@ def find_failed_sudo(lines):
             print(line.strip())
             print()
 
+            events.append(line.strip())
+
             failed_counter += 1
 
         elif incorrect_pattern.search(line):
@@ -252,11 +300,17 @@ def find_failed_sudo(lines):
             print(line.strip())
             print()
 
+            events.append(line.strip())
+
             failed_counter += 1
 
     print("---------------------------")
     print(f"Всего неудачных sudo: {failed_counter}")
 
+    return {
+        "total": failed_counter,
+        "events": events
+    }
 
 
 def find_root_logins(lines):
@@ -269,6 +323,7 @@ def find_root_logins(lines):
     )
 
     root_counter = 0
+    root_ips = []
 
     print("\n===== ROOT LOGIN =====\n")
 
@@ -284,22 +339,23 @@ def find_root_logins(lines):
             print(f"IP: {ip}")
             print()
 
+            root_ips.append(ip)
+
             root_counter += 1
 
     print("---------------------------")
     print(f"Всего входов под root: {root_counter}")
 
+    return {
+        "total": root_counter,
+        "ips": root_ips
+    }
 
 
-def export_results():
+def export_results(results):
     """
     Сохраняет результаты анализа в JSON.
     """
-
-    results = {
-        "log_file": str(LOG_PATH),
-        "status": "analysis completed"
-    }
 
     with open("results.json", "w", encoding="utf-8") as file:
         json.dump(results, file, indent=4, ensure_ascii=False)
@@ -307,24 +363,34 @@ def export_results():
     print("\nРезультаты сохранены в results.json")
 
 
-
 def main():
+
     lines = read_log(LOG_PATH)
 
     print(f"Всего строк: {len(lines)}")
 
-    find_failed_password(lines)
-    find_success_login(lines)
-    correlate_bruteforce_success(lines)
-    find_sudo_activity(lines)
-    find_new_users(lines)
-    find_ssh_sessions(lines)
-    find_failed_sudo(lines)
-    find_root_logins(lines)
-    
-    export_results()
+    failed = find_failed_password(lines)
+    success = find_success_login(lines)
+    brute = correlate_bruteforce_success(lines)
+    sudo = find_sudo_activity(lines)
+    users = find_new_users(lines)
+    sessions = find_ssh_sessions(lines)
+    failed_sudo = find_failed_sudo(lines)
+    root = find_root_logins(lines)
 
+    results = {
+        "log_file": str(LOG_PATH),
+        "failed_passwords": failed,
+        "successful_logins": success,
+        "brute_force_events": brute,
+        "sudo_activity": sudo,
+        "new_users": users,
+        "ssh_sessions": sessions,
+        "failed_sudo": failed_sudo,
+        "root_logins": root
+    }
 
+    export_results(results)
 
 
 if __name__ == "__main__":
