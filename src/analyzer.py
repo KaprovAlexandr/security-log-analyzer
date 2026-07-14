@@ -2,6 +2,9 @@ import re
 import json
 from pathlib import Path
 from collections import Counter
+from colorama import init, Fore, Style
+
+init(autoreset=True)
 
 LOG_PATH = Path("logs/auth.log")
 
@@ -38,12 +41,14 @@ def find_failed_password(lines):
             ip_counter[ip] += 1
             failed_count += 1
 
-    print("\n===== Failed password =====\n")
+    print(f"\n{Fore.BLUE}{Style.BRIGHT}===== Failed password ====={Style.RESET_ALL}\n")
 
     for ip, count in ip_counter.most_common(10):
 
         if count >= 5:
-            print(f"{ip} -> {count} попыток  BRUTE FORCE")
+            print(
+                f"{Fore.RED}{Style.BRIGHT}{ip} -> {count} попыток  BRUTE FORCE{Style.RESET_ALL}"
+            )
         else:
             print(f"{ip} -> {count} попыток")
 
@@ -68,7 +73,7 @@ def find_success_login(lines):
     success_counter = 0
     success_logins = []
 
-    print("\n===== Successful Login =====\n")
+    print(f"\n{Fore.BLUE}{Style.BRIGHT}===== Successful Login ====={Style.RESET_ALL}\n")
 
     for line in lines:
 
@@ -78,7 +83,9 @@ def find_success_login(lines):
             user = match.group(1)
             ip = match.group(2)
 
-            print(f"{ip} -> пользователь {user}")
+            print(
+                f"{Fore.GREEN}{ip} -> пользователь {user}{Style.RESET_ALL}"
+            )
 
             success_logins.append({
                 "user": user,
@@ -111,7 +118,7 @@ def correlate_bruteforce_success(lines):
 
     failed_counter = Counter()
 
-    print("\n===== Brute Force Correlation =====\n")
+    print(f"\n{Fore.BLUE}{Style.BRIGHT}===== Brute Force Correlation ====={Style.RESET_ALL}\n")
 
     brute_force_events = []
 
@@ -132,10 +139,14 @@ def correlate_bruteforce_success(lines):
 
             if failed_counter[ip] >= 5:
 
-                print("ВОЗМОЖНЫЙ BRUTE FORCE")
-                print(f"IP: {ip}")
-                print(f"User: {user}")
-                print(f"Failed attempts: {failed_counter[ip]}")
+                print(
+                    f"{Fore.RED}{Style.BRIGHT}ВОЗМОЖНЫЙ BRUTE FORCE{Style.RESET_ALL}"
+                )
+                print(f"{Fore.RED}IP: {ip}{Style.RESET_ALL}")
+                print(f"{Fore.YELLOW}User: {user}{Style.RESET_ALL}")
+                print(
+                    f"{Fore.RED}Failed attempts: {failed_counter[ip]}{Style.RESET_ALL}"
+                )
                 print()
 
                 brute_force_events.append({
@@ -159,7 +170,7 @@ def find_sudo_activity(lines):
     sudo_counter = 0
     commands = []
 
-    print("\n===== SUDO ACTIVITY =====\n")
+    print(f"\n{Fore.BLUE}{Style.BRIGHT}===== SUDO ACTIVITY ====={Style.RESET_ALL}\n")
 
     for line in lines:
 
@@ -170,8 +181,12 @@ def find_sudo_activity(lines):
             user = match.group(1)
             command = match.group(2)
 
-            print(f"Пользователь: {user}")
-            print(f"Команда: {command}")
+            print(
+                f"{Fore.YELLOW}Пользователь: {user}{Style.RESET_ALL}"
+            )
+            print(
+                f"{Fore.YELLOW}Команда: {command}{Style.RESET_ALL}"
+            )
             print()
 
             commands.append({
@@ -202,7 +217,7 @@ def find_new_users(lines):
     user_counter = 0
     users = []
 
-    print("\n===== NEW USERS =====\n")
+    print(f"\n{Fore.BLUE}{Style.BRIGHT}===== NEW USERS ====={Style.RESET_ALL}\n")
 
     for line in lines:
 
@@ -212,7 +227,9 @@ def find_new_users(lines):
 
             username = match.group(1)
 
-            print(f"Создан пользователь: {username}")
+            print(
+                f"{Fore.CYAN}Создан пользователь: {username}{Style.RESET_ALL}"
+            )
 
             users.append(username)
 
@@ -239,7 +256,7 @@ def find_ssh_sessions(lines):
     session_counter = 0
     sessions = []
 
-    print("\n===== SSH SESSIONS =====\n")
+    print(f"\n{Fore.BLUE}{Style.BRIGHT}===== SSH SESSIONS ====={Style.RESET_ALL}\n")
 
     for line in lines:
 
@@ -249,7 +266,9 @@ def find_ssh_sessions(lines):
 
             user = match.group(1)
 
-            print(f"Открыта SSH-сессия: {user}")
+            print(
+                f"{Fore.CYAN}Открыта SSH-сессия: {user}{Style.RESET_ALL}"
+            )
 
             sessions.append(user)
 
@@ -280,13 +299,15 @@ def find_failed_sudo(lines):
     failed_counter = 0
     events = []
 
-    print("\n===== FAILED SUDO =====\n")
+    print(f"\n{Fore.BLUE}{Style.BRIGHT}===== FAILED SUDO ====={Style.RESET_ALL}\n")
 
     for line in lines:
 
         if failure_pattern.search(line):
 
-            print("Authentication failure")
+            print(
+                f"{Fore.RED}Authentication failure{Style.RESET_ALL}"
+            )
             print(line.strip())
             print()
 
@@ -296,7 +317,9 @@ def find_failed_sudo(lines):
 
         elif incorrect_pattern.search(line):
 
-            print("Incorrect password attempts")
+            print(
+                f"{Fore.RED}Incorrect password attempts{Style.RESET_ALL}"
+            )
             print(line.strip())
             print()
 
@@ -325,7 +348,7 @@ def find_root_logins(lines):
     root_counter = 0
     root_ips = []
 
-    print("\n===== ROOT LOGIN =====\n")
+    print(f"\n{Fore.BLUE}{Style.BRIGHT}===== ROOT LOGIN ====={Style.RESET_ALL}\n")
 
     for line in lines:
 
@@ -335,8 +358,12 @@ def find_root_logins(lines):
 
             ip = match.group(1)
 
-            print("ВНИМАНИЕ! Вход под root")
-            print(f"IP: {ip}")
+            print(
+                f"{Fore.RED}{Style.BRIGHT}ВНИМАНИЕ! ВХОД ПОД ROOT{Style.RESET_ALL}"
+            )
+            print(
+                f"{Fore.RED}IP: {ip}{Style.RESET_ALL}"
+            )
             print()
 
             root_ips.append(ip)
