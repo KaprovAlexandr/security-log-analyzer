@@ -6,8 +6,20 @@ from collections import Counter
 from colorama import init, Fore, Style
 
 init(autoreset=True)
+USE_COLOR = True
 
 LOG_PATH = Path("logs/auth.log")
+
+
+def color(text, color_code="", style_code=""):
+    """
+    Возвращает цветной текст, если цвет включён.
+    """
+
+    if not USE_COLOR:
+        return text
+
+    return f"{color_code}{style_code}{text}{Style.RESET_ALL}"
 
 
 def parse_arguments():
@@ -31,6 +43,12 @@ def parse_arguments():
         "--json",
         default="results.json",
         help="Имя JSON-файла для сохранения результатов"
+    )
+
+    parser.add_argument(
+        "--no-color",
+        action="store_true",
+        help="Отключить цветной вывод"
     )
 
     return parser.parse_args()
@@ -68,13 +86,17 @@ def find_failed_password(lines):
             ip_counter[ip] += 1
             failed_count += 1
 
-    print(f"\n{Fore.BLUE}{Style.BRIGHT}===== Failed password ====={Style.RESET_ALL}\n")
+    print("\n" + color("===== Failed password =====", Fore.BLUE, Style.BRIGHT) + "\n")
 
     for ip, count in ip_counter.most_common(10):
 
         if count >= 5:
             print(
-                f"{Fore.RED}{Style.BRIGHT}{ip} -> {count} попыток  BRUTE FORCE{Style.RESET_ALL}"
+                color(
+                    f"{ip} -> {count} попыток  BRUTE FORCE",
+                    Fore.RED,
+                    Style.BRIGHT
+                )
             )
         else:
             print(f"{ip} -> {count} попыток")
@@ -100,7 +122,15 @@ def find_success_login(lines):
     success_counter = 0
     success_logins = []
 
-    print(f"\n{Fore.BLUE}{Style.BRIGHT}===== Successful Login ====={Style.RESET_ALL}\n")
+    print(
+        "\n" +
+        color(
+            "===== Successful Login =====",
+            Fore.BLUE,
+            Style.BRIGHT
+        ) +
+        "\n"
+    )
 
     for line in lines:
 
@@ -111,7 +141,10 @@ def find_success_login(lines):
             ip = match.group(2)
 
             print(
-                f"{Fore.GREEN}{ip} -> пользователь {user}{Style.RESET_ALL}"
+                color(
+                    f"{ip} -> пользователь {user}",
+                    Fore.GREEN
+                )
             )
 
             success_logins.append({
@@ -145,7 +178,15 @@ def correlate_bruteforce_success(lines):
 
     failed_counter = Counter()
 
-    print(f"\n{Fore.BLUE}{Style.BRIGHT}===== Brute Force Correlation ====={Style.RESET_ALL}\n")
+    print(
+        "\n" +
+        color(
+            "===== Brute Force Correlation =====",
+            Fore.BLUE,
+            Style.BRIGHT
+        ) +
+        "\n"
+    )
 
     brute_force_events = []
 
@@ -167,12 +208,32 @@ def correlate_bruteforce_success(lines):
             if failed_counter[ip] >= 5:
 
                 print(
-                    f"{Fore.RED}{Style.BRIGHT}ВОЗМОЖНЫЙ BRUTE FORCE{Style.RESET_ALL}"
+                    color(
+                        "ВОЗМОЖНЫЙ BRUTE FORCE",
+                        Fore.RED,
+                        Style.BRIGHT
+                    )
                 )
-                print(f"{Fore.RED}IP: {ip}{Style.RESET_ALL}")
-                print(f"{Fore.YELLOW}User: {user}{Style.RESET_ALL}")
+
                 print(
-                    f"{Fore.RED}Failed attempts: {failed_counter[ip]}{Style.RESET_ALL}"
+                    color(
+                        f"IP: {ip}",
+                        Fore.RED
+                    )
+                )
+
+                print(
+                    color(
+                        f"User: {user}",
+                        Fore.YELLOW
+                    )
+                )
+
+                print(
+                    color(
+                        f"Failed attempts: {failed_counter[ip]}",
+                        Fore.RED
+                    )
                 )
                 print()
 
@@ -197,7 +258,15 @@ def find_sudo_activity(lines):
     sudo_counter = 0
     commands = []
 
-    print(f"\n{Fore.BLUE}{Style.BRIGHT}===== SUDO ACTIVITY ====={Style.RESET_ALL}\n")
+    print(
+        "\n" +
+        color(
+            "===== SUDO ACTIVITY =====",
+            Fore.BLUE,
+            Style.BRIGHT
+        ) +
+        "\n"
+    )
 
     for line in lines:
 
@@ -209,10 +278,17 @@ def find_sudo_activity(lines):
             command = match.group(2)
 
             print(
-                f"{Fore.YELLOW}Пользователь: {user}{Style.RESET_ALL}"
+                color(
+                    f"Пользователь: {user}",
+                    Fore.YELLOW
+                )
             )
+
             print(
-                f"{Fore.YELLOW}Команда: {command}{Style.RESET_ALL}"
+                color(
+                    f"Команда: {command}",
+                    Fore.YELLOW
+                )
             )
             print()
 
@@ -244,7 +320,15 @@ def find_new_users(lines):
     user_counter = 0
     users = []
 
-    print(f"\n{Fore.BLUE}{Style.BRIGHT}===== NEW USERS ====={Style.RESET_ALL}\n")
+    print(
+        "\n" +
+        color(
+            "===== NEW USERS =====",
+            Fore.BLUE,
+            Style.BRIGHT
+        ) +
+        "\n"
+    )
 
     for line in lines:
 
@@ -255,7 +339,10 @@ def find_new_users(lines):
             username = match.group(1)
 
             print(
-                f"{Fore.CYAN}Создан пользователь: {username}{Style.RESET_ALL}"
+                color(
+                    f"Создан пользователь: {username}",
+                    Fore.CYAN
+                )
             )
 
             users.append(username)
@@ -283,7 +370,15 @@ def find_ssh_sessions(lines):
     session_counter = 0
     sessions = []
 
-    print(f"\n{Fore.BLUE}{Style.BRIGHT}===== SSH SESSIONS ====={Style.RESET_ALL}\n")
+    print(
+        "\n" +
+        color(
+            "===== SSH SESSIONS =====",
+            Fore.BLUE,
+            Style.BRIGHT
+        ) +
+        "\n"
+    )
 
     for line in lines:
 
@@ -294,7 +389,10 @@ def find_ssh_sessions(lines):
             user = match.group(1)
 
             print(
-                f"{Fore.CYAN}Открыта SSH-сессия: {user}{Style.RESET_ALL}"
+                color(
+                    f"Открыта SSH-сессия: {user}",
+                    Fore.CYAN
+                )
             )
 
             sessions.append(user)
@@ -326,14 +424,25 @@ def find_failed_sudo(lines):
     failed_counter = 0
     events = []
 
-    print(f"\n{Fore.BLUE}{Style.BRIGHT}===== FAILED SUDO ====={Style.RESET_ALL}\n")
+    print(
+        "\n" +
+        color(
+            "===== FAILED SUDO =====",
+            Fore.BLUE,
+            Style.BRIGHT
+        ) +
+        "\n"
+    )
 
     for line in lines:
 
         if failure_pattern.search(line):
 
             print(
-                f"{Fore.RED}Authentication failure{Style.RESET_ALL}"
+                color(
+                    "Authentication failure",
+                    Fore.RED
+                )
             )
             print(line.strip())
             print()
@@ -345,7 +454,10 @@ def find_failed_sudo(lines):
         elif incorrect_pattern.search(line):
 
             print(
-                f"{Fore.RED}Incorrect password attempts{Style.RESET_ALL}"
+                color(
+                    "Incorrect password attempts",
+                    Fore.RED
+                )
             )
             print(line.strip())
             print()
@@ -375,7 +487,15 @@ def find_root_logins(lines):
     root_counter = 0
     root_ips = []
 
-    print(f"\n{Fore.BLUE}{Style.BRIGHT}===== ROOT LOGIN ====={Style.RESET_ALL}\n")
+    print(
+        "\n" +
+        color(
+            "===== ROOT LOGIN =====",
+            Fore.BLUE,
+            Style.BRIGHT
+        ) +
+        "\n"
+    )
 
     for line in lines:
 
@@ -386,10 +506,18 @@ def find_root_logins(lines):
             ip = match.group(1)
 
             print(
-                f"{Fore.RED}{Style.BRIGHT}ВНИМАНИЕ! ВХОД ПОД ROOT{Style.RESET_ALL}"
+                color(
+                    "ВНИМАНИЕ! ВХОД ПОД ROOT",
+                    Fore.RED,
+                    Style.BRIGHT
+                )
             )
+
             print(
-                f"{Fore.RED}IP: {ip}{Style.RESET_ALL}"
+                color(
+                    f"IP: {ip}",
+                    Fore.RED
+                )
             )
             print()
 
@@ -420,6 +548,10 @@ def export_results(results, output_file):
 def main():
 
     args = parse_arguments()
+
+    global USE_COLOR
+    USE_COLOR = not args.no_color
+
     log_path = Path(args.file)
     output_file = args.json
     lines = read_log(log_path)
