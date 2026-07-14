@@ -1,5 +1,6 @@
 import re
 import json
+import argparse
 from pathlib import Path
 from collections import Counter
 from colorama import init, Fore, Style
@@ -7,6 +8,25 @@ from colorama import init, Fore, Style
 init(autoreset=True)
 
 LOG_PATH = Path("logs/auth.log")
+
+
+def parse_arguments():
+    """
+    Обрабатывает аргументы командной строки.
+    """
+
+    parser = argparse.ArgumentParser(
+        description="Security Log Analyzer"
+    )
+
+    parser.add_argument(
+        "-f",
+        "--file",
+        default="logs/auth.log",
+        help="Путь к log-файлу"
+    )
+
+    return parser.parse_args()
 
 
 def read_log(path: Path):
@@ -392,7 +412,9 @@ def export_results(results):
 
 def main():
 
-    lines = read_log(LOG_PATH)
+    args = parse_arguments()
+    log_path = Path(args.file)
+    lines = read_log(log_path)
 
     print(f"Всего строк: {len(lines)}")
 
@@ -406,7 +428,7 @@ def main():
     root = find_root_logins(lines)
 
     results = {
-        "log_file": str(LOG_PATH),
+        "log_file": str(log_path),
         "failed_passwords": failed,
         "successful_logins": success,
         "brute_force_events": brute,
