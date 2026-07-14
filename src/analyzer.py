@@ -26,6 +26,13 @@ def parse_arguments():
         help="Путь к log-файлу"
     )
 
+    parser.add_argument(
+        "-j",
+        "--json",
+        default="results.json",
+        help="Имя JSON-файла для сохранения результатов"
+    )
+
     return parser.parse_args()
 
 
@@ -399,21 +406,22 @@ def find_root_logins(lines):
     }
 
 
-def export_results(results):
+def export_results(results, output_file):
     """
     Сохраняет результаты анализа в JSON.
     """
 
-    with open("results.json", "w", encoding="utf-8") as file:
+    with open(output_file, "w", encoding="utf-8") as file:
         json.dump(results, file, indent=4, ensure_ascii=False)
 
-    print("\nРезультаты сохранены в results.json")
+    print(f"\nРезультаты сохранены в {output_file}")
 
 
 def main():
 
     args = parse_arguments()
     log_path = Path(args.file)
+    output_file = args.json
     lines = read_log(log_path)
 
     print(f"Всего строк: {len(lines)}")
@@ -439,7 +447,7 @@ def main():
         "root_logins": root
     }
 
-    export_results(results)
+    export_results(results, output_file)
 
 
 if __name__ == "__main__":
